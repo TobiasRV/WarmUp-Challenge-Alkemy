@@ -21,7 +21,7 @@ router.get('/', async (req, res) => {
 router.get('/:id' , async (req , res)=> {
   const id = req.params.id;
   try {
-      let post = await Post.findOne({
+      const post = await Post.findOne({
         where: { id},
         attributes:['id', 'title', 'content', 'image', 'createdAt'],
         include: Category
@@ -37,6 +37,10 @@ router.get('/:id' , async (req , res)=> {
 router.post('/', async (req, res) => {
   const newPost = req.body;
   try {
+    if(typeof(newPost.category_id) === 'string'){
+      const category = await Category.findOne({ where: { name: newPost.category_id }});
+      newPost.category_id = category.id;
+    }
     if(newPost.image.match(/\.(jpg|png)$/) === null) throw new Error('Url must be an image');
     const post = await Post.create(newPost);
     res.json(post);
@@ -52,7 +56,7 @@ router.patch('/:id', async (req, res) => {
   try {
     if(newPost.hasOwnProperty('id')) throw new Error('Cannot change the id');
     await Post.update( { ...newPost }, { where: { id }});
-    let post = await Post.findOne({
+    const post = await Post.findOne({
       where: { id},
       attributes:['id', 'title', 'content', 'image', 'createdAt'],
       include: Category
@@ -68,7 +72,7 @@ router.patch('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   const id = req.params.id;
   try {
-    let post = await Post.findOne({
+    const post = await Post.findOne({
       where: { id},
       attributes:['id', 'title', 'content', 'image', 'createdAt'],
       include: Category
