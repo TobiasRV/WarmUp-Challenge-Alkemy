@@ -65,8 +65,11 @@ router.patch('/:id', async (req, res) => {
       const category = await Category.findOne({ where: { name: newPost.category_id }});
       newPost.category_id = category.id;
     }
-    if(newPost.image.match(/\.(jpg|png)$/) === null)
+    if(newPost.hasOwnProperty('image')){
+      if(newPost.image.match(/\.(jpg|png)$/) === null)
       throw new Error('Url must be an image');
+    }
+
     await Post.update( { ...newPost }, { where: { id }});
     const post = await Post.findOne({
       where: { id},
